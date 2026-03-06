@@ -1,7 +1,6 @@
 package transactions
 
 import (
-	"context"
 	"net/http"
 	"prueba-go/internal/domain/transaction"
 	"prueba-go/internal/infrastructure/http/v1/transactions/models"
@@ -52,10 +51,7 @@ func (h *TransactionHandler) Create(c *gin.Context) {
 		Amount:      amount,
 	}
 
-	actor := c.GetHeader("X-User-Id")
-	ctx := context.WithValue(c.Request.Context(), "actor", actor)
-
-	res, err := h.usecase.Create(ctx, tr)
+	res, err := h.usecase.Create(c.Request.Context(), tr)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -84,10 +80,7 @@ func (h *TransactionHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	actor := c.GetHeader("X-User-Id")
-	ctx := context.WithValue(c.Request.Context(), "actor", actor)
-
-	res, err := h.usecase.GetByID(ctx, types.UID(id))
+	res, err := h.usecase.GetByID(c.Request.Context(), types.UID(id))
 	if err != nil {
 		if err == transaction.ErrTransactionNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})

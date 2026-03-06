@@ -1,7 +1,6 @@
 package comercios
 
 import (
-	"context"
 	"net/http"
 	comercio "prueba-go/internal/domain/commerce"
 	"prueba-go/internal/infrastructure/http/v1/comercios/models"
@@ -52,10 +51,7 @@ func (h *ComercioHandler) Create(c *gin.Context) {
 		ComissionRate: rate,
 	}
 
-	actor := c.GetHeader("X-User-Id")
-	ctx := context.WithValue(c.Request.Context(), "actor", actor)
-
-	created, err := h.usecase.Create(ctx, commerceEntity)
+	created, err := h.usecase.Create(c.Request.Context(), commerceEntity)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -164,10 +160,7 @@ func (h *ComercioHandler) Update(c *gin.Context) {
 		commerceEntity.ComissionRate = rate
 	}
 
-	actor := c.GetHeader("X-User-Id")
-	ctx := context.WithValue(c.Request.Context(), "actor", actor)
-
-	err := h.usecase.Update(ctx, commerceEntity)
+	err := h.usecase.Update(c.Request.Context(), commerceEntity)
 	if err != nil {
 		if err == comercio.ErrComercioNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -200,10 +193,7 @@ func (h *ComercioHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	actor := c.GetHeader("X-User-Id")
-	ctx := context.WithValue(c.Request.Context(), "actor", actor)
-
-	err := h.usecase.Delete(ctx, types.UID(id))
+	err := h.usecase.Delete(c.Request.Context(), types.UID(id))
 	if err != nil {
 		if err == comercio.ErrComercioNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})

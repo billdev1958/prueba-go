@@ -27,10 +27,7 @@ func (u *useCases) Create(ctx context.Context, c *comercio.Comercio) (*comercio.
 
 	res, err := u.comercioRepo.Create(ctx, c)
 	if err == nil {
-		actor, _ := ctx.Value("actor").(string)
-		if actor == "" {
-			actor = "system_unknown"
-		}
+		actor := types.GetActor(ctx)
 
 		go func(actor string, resourceID types.UID) {
 			_ = u.auditRepo.Save(context.Background(), &audit.AuditLog{

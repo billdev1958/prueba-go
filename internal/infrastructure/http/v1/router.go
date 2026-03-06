@@ -4,6 +4,7 @@ import (
 	_ "prueba-go/internal/docs"
 	"prueba-go/internal/infrastructure/http/v1/audit"
 	"prueba-go/internal/infrastructure/http/v1/comercios"
+	"prueba-go/internal/infrastructure/http/v1/middleware"
 	"prueba-go/internal/infrastructure/http/v1/reports"
 	"prueba-go/internal/infrastructure/http/v1/transactions"
 
@@ -24,6 +25,7 @@ func RegisterRoutes(r *gin.Engine, config RouterConfig) {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	v1 := r.Group("/api/v1")
+	v1.Use(middleware.Auth())
 	{
 		comercios.RegisterRoutes(v1, config.CommerceHandler)
 		reports.RegisterRoutes(v1, config.ReportHandler)
