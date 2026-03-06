@@ -1,3 +1,4 @@
+basePath: /api/v1
 definitions:
   common.ErrorResponse:
     properties:
@@ -101,8 +102,19 @@ definitions:
         example: Abarrotes Doña María Sucursal 2
         type: string
     type: object
+host: localhost:8080
 info:
-  contact: {}
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: API for commerce, transactions, reports and audit logs.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Commerce API
+  version: "1.0"
 paths:
   /audit:
     get:
@@ -433,4 +445,9 @@ paths:
       summary: Get a transaction by ID
       tags:
       - transactions
+securityDefinitions:
+  UserID:
+    in: header
+    name: X-User-Id
+    type: apiKey
 swagger: "2.0"
