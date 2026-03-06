@@ -22,6 +22,18 @@ func NewComercioHandler(usecase usecases.ComercioUsecase) *ComercioHandler {
 	}
 }
 
+// Create godoc
+// @Summary Create a new commerce
+// @Description Create a new commerce with the given name and commission rate
+// @Tags comercios
+// @Accept json
+// @Produce json
+// @Param comercio body models.CreateComercioRequest true "Commerce to create"
+// @Success 201 {object} models.ComercioResponse
+// @Failure 400 {object} common.ErrorResponse
+// @Failure 500 {object} common.ErrorResponse
+// @Security UserID
+// @Router /comercios [post]
 func (h *ComercioHandler) Create(c *gin.Context) {
 	var req models.CreateComercioRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -52,6 +64,18 @@ func (h *ComercioHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, toResponse(created))
 }
 
+// GetByID godoc
+// @Summary Get a commerce by ID
+// @Description Get detailed information about a commerce using its UUID
+// @Tags comercios
+// @Accept json
+// @Produce json
+// @Param id path string true "UUID del comercio" format(uuid) example(550e8400-e29b-41d4-a716-446655440000)
+// @Success 200 {object} models.ComercioResponse
+// @Failure 400 {object} common.ErrorResponse
+// @Failure 404 {object} common.ErrorResponse
+// @Failure 500 {object} common.ErrorResponse
+// @Router /comercios/{id} [get]
 func (h *ComercioHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
@@ -72,6 +96,15 @@ func (h *ComercioHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, toResponse(&res))
 }
 
+// GetAll godoc
+// @Summary List all comercios
+// @Description Get a list of all registered comercios
+// @Tags comercios
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.ComercioResponse
+// @Failure 500 {object} common.ErrorResponse
+// @Router /comercios [get]
 func (h *ComercioHandler) GetAll(c *gin.Context) {
 	list, err := h.usecase.GetAll(c.Request.Context())
 	if err != nil {
@@ -87,6 +120,20 @@ func (h *ComercioHandler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, responses)
 }
 
+// Update godoc
+// @Summary Update an existing commerce
+// @Description Update the name or commission rate of a commerce
+// @Tags comercios
+// @Accept json
+// @Produce json
+// @Param id path string true "UUID del comercio" format(uuid) example(550e8400-e29b-41d4-a716-446655440000)
+// @Param comercio body models.UpdateComercioRequest true "Updated commerce data"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} common.ErrorResponse
+// @Failure 404 {object} common.ErrorResponse
+// @Failure 500 {object} common.ErrorResponse
+// @Security UserID
+// @Router /comercios/{id} [put]
 func (h *ComercioHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
@@ -133,6 +180,19 @@ func (h *ComercioHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "updated"})
 }
 
+// Delete godoc
+// @Summary Delete a commerce
+// @Description Remove a commerce by its UUID
+// @Tags comercios
+// @Accept json
+// @Produce json
+// @Param id path string true "UUID del comercio" format(uuid) example(550e8400-e29b-41d4-a716-446655440000)
+// @Success 204 "No Content"
+// @Failure 400 {object} common.ErrorResponse
+// @Failure 404 {object} common.ErrorResponse
+// @Failure 500 {object} common.ErrorResponse
+// @Security UserID
+// @Router /comercios/{id} [delete]
 func (h *ComercioHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {

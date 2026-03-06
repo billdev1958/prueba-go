@@ -1,0 +1,436 @@
+definitions:
+  common.ErrorResponse:
+    properties:
+      error:
+        example: información del error aquí
+        type: string
+    type: object
+  models.AuditResponse:
+    properties:
+      action:
+        example: COMMERCE_CREATE
+        type: string
+      actor:
+        example: admin_user
+        type: string
+      log_id:
+        example: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
+        type: string
+      resource_id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      timestamp:
+        example: "2023-10-27T10:00:00Z"
+        type: string
+    type: object
+  models.ComercioResponse:
+    properties:
+      comission_rate:
+        example: "0.025"
+        type: string
+      created_at:
+        example: "2023-10-27T10:00:00Z"
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      name:
+        example: Abarrotes Doña María
+        type: string
+    type: object
+  models.CreateComercioRequest:
+    properties:
+      comission_rate:
+        example: "0.025"
+        type: string
+      name:
+        example: Abarrotes Doña María
+        type: string
+    required:
+    - comission_rate
+    - name
+    type: object
+  models.CreateTransactionRequest:
+    properties:
+      amount:
+        example: "100.00"
+        type: string
+      comercio_id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+    required:
+    - amount
+    - comercio_id
+    type: object
+  models.EarningsResponse:
+    properties:
+      amount:
+        example: "1500.50"
+        type: string
+    type: object
+  models.TransactionResponse:
+    properties:
+      amount:
+        example: "100.00"
+        type: string
+      comercio_id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      commission:
+        example: "0.025"
+        type: string
+      created_at:
+        example: "2023-10-27T10:05:00Z"
+        type: string
+      fee:
+        example: "2.50"
+        type: string
+      id:
+        example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        type: string
+      net_amount:
+        example: "97.50"
+        type: string
+    type: object
+  models.UpdateComercioRequest:
+    properties:
+      comission_rate:
+        example: "0.030"
+        type: string
+      name:
+        example: Abarrotes Doña María Sucursal 2
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /audit:
+    get:
+      consumes:
+      - application/json
+      description: Get a full history of all actions recorded in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.AuditResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: List all audit logs
+      tags:
+      - audit
+  /comercios:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all registered comercios
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ComercioResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: List all comercios
+      tags:
+      - comercios
+    post:
+      consumes:
+      - application/json
+      description: Create a new commerce with the given name and commission rate
+      parameters:
+      - description: Commerce to create
+        in: body
+        name: comercio
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateComercioRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ComercioResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      security:
+      - UserID: []
+      summary: Create a new commerce
+      tags:
+      - comercios
+  /comercios/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a commerce by its UUID
+      parameters:
+      - description: UUID del comercio
+        example: 550e8400-e29b-41d4-a716-446655440000
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      security:
+      - UserID: []
+      summary: Delete a commerce
+      tags:
+      - comercios
+    get:
+      consumes:
+      - application/json
+      description: Get detailed information about a commerce using its UUID
+      parameters:
+      - description: UUID del comercio
+        example: 550e8400-e29b-41d4-a716-446655440000
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ComercioResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: Get a commerce by ID
+      tags:
+      - comercios
+    put:
+      consumes:
+      - application/json
+      description: Update the name or commission rate of a commerce
+      parameters:
+      - description: UUID del comercio
+        example: 550e8400-e29b-41d4-a716-446655440000
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated commerce data
+        in: body
+        name: comercio
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateComercioRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      security:
+      - UserID: []
+      summary: Update an existing commerce
+      tags:
+      - comercios
+  /reports/earnings/global:
+    get:
+      consumes:
+      - application/json
+      description: Calculate the sum of all net earnings across all transactions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EarningsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      security:
+      - UserID: []
+      summary: Get total global earnings
+      tags:
+      - reports
+  /reports/earnings/merchant/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Calculate the sum of net earnings for a merchant by their UUID
+      parameters:
+      - description: UUID del comercio
+        example: 550e8400-e29b-41d4-a716-446655440000
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EarningsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      security:
+      - UserID: []
+      summary: Get earnings for a specific merchant
+      tags:
+      - reports
+  /transactions:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all recorded transactions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TransactionResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: List all transactions
+      tags:
+      - transactions
+    post:
+      consumes:
+      - application/json
+      description: Record a new transaction for a commerce
+      parameters:
+      - description: Transaction data
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.TransactionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      security:
+      - UserID: []
+      summary: Create a new transaction
+      tags:
+      - transactions
+  /transactions/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed information about a transaction using its UUID
+      parameters:
+      - description: UUID de la transacción
+        example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TransactionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      security:
+      - UserID: []
+      summary: Get a transaction by ID
+      tags:
+      - transactions
+swagger: "2.0"

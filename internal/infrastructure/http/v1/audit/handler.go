@@ -18,6 +18,15 @@ func NewAuditHandler(usecase usecases.AuditUsecase) *AuditHandler {
 	}
 }
 
+// GetAll godoc
+// @Summary List all audit logs
+// @Description Get a full history of all actions recorded in the system
+// @Tags audit
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.AuditResponse
+// @Failure 500 {object} common.ErrorResponse
+// @Router /audit [get]
 func (h *AuditHandler) GetAll(c *gin.Context) {
 	logs, err := h.usecase.GetAll(c.Request.Context())
 	if err != nil {

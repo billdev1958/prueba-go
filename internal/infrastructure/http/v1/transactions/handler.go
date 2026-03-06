@@ -22,6 +22,18 @@ func NewTransactionHandler(usecase usecases.TransactionUsecases) *TransactionHan
 	}
 }
 
+// Create godoc
+// @Summary Create a new transaction
+// @Description Record a new transaction for a commerce
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Param transaction body models.CreateTransactionRequest true "Transaction data"
+// @Success 201 {object} models.TransactionResponse
+// @Failure 400 {object} common.ErrorResponse
+// @Failure 500 {object} common.ErrorResponse
+// @Security UserID
+// @Router /transactions [post]
 func (h *TransactionHandler) Create(c *gin.Context) {
 	var req models.CreateTransactionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -52,6 +64,19 @@ func (h *TransactionHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, toResponse(res))
 }
 
+// GetByID godoc
+// @Summary Get a transaction by ID
+// @Description Get detailed information about a transaction using its UUID
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Param id path string true "UUID de la transacción" format(uuid) example(f47ac10b-58cc-4372-a567-0e02b2c3d479)
+// @Success 200 {object} models.TransactionResponse
+// @Failure 400 {object} common.ErrorResponse
+// @Failure 404 {object} common.ErrorResponse
+// @Failure 500 {object} common.ErrorResponse
+// @Security UserID
+// @Router /transactions/{id} [get]
 func (h *TransactionHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
@@ -75,6 +100,15 @@ func (h *TransactionHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, toResponse(&res))
 }
 
+// GetAll godoc
+// @Summary List all transactions
+// @Description Get a list of all recorded transactions
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.TransactionResponse
+// @Failure 500 {object} common.ErrorResponse
+// @Router /transactions [get]
 func (h *TransactionHandler) GetAll(c *gin.Context) {
 	list, err := h.usecase.GetAll(c.Request.Context())
 	if err != nil {
