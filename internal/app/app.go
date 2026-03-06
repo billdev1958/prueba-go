@@ -40,16 +40,8 @@ type App struct {
 func NewApp() (*App, error) {
 	// 1. Get configuration from environment
 	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-		log.Printf("PORT no está definido, usando por defecto: %s", port)
-	}
 
 	dsn := os.Getenv("DATABASE_URL")
-	if dsn == "" {
-		dsn = "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"
-		log.Printf("DATABASE_URL no está definido, usando por defecto")
-	}
 
 	// 2. Setup database
 	pool, err := setupDatabase(dsn)
