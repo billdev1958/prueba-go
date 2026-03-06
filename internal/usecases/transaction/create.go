@@ -43,7 +43,7 @@ func (u *useCases) Create(ctx context.Context, t *transaction.Transaction) (*tra
 				Action:     "TRANSACTION_CREATE",
 				Actor:      actor,
 				ResourceID: resourceID,
-				Timestamp:  time.Now(),
+				Timestamp:  time.Now().UTC(),
 			})
 		}(actor, res.ID)
 	}

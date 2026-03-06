@@ -23,7 +23,7 @@ func (u *useCases) GetEarningsByMerchant(ctx context.Context, merchantID types.U
 				Action:     "REPORT_GET_EARNINGS_BY_MERCHANT",
 				Actor:      actor,
 				ResourceID: resourceID,
-				Timestamp:  time.Now(),
+				Timestamp:  time.Now().UTC(),
 			})
 		}(actor, merchantID)
 	}

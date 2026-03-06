@@ -99,7 +99,7 @@ El proyecto incluye un robusto sistema de auditoría transversal diseñado para 
     - `Action`: Descripción de la operación realizada (ej: "Crear Comercio").
     - `Actor`: Identificación del usuario que realizó la acción (extraído del encabezado).
     - `ResourceID`: Identificador de la entidad afectada (el ID del comercio, transacción, etc.).
-    - `Timestamp`: Fecha y hora exacta de la operación.
+    - `Timestamp`: Fecha y hora de la operación (formato RFC3339).
 
 ### Flujo de Trabajo
 1. El middleware/handler extrae el `X-User-Id` y lo guarda en el `context.Context`.

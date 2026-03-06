@@ -22,7 +22,7 @@ func (u *useCases) GetGlobalEarnings(ctx context.Context) (money.Amount, error) 
 				Action:     "REPORT_GET_GLOBAL_EARNINGS",
 				Actor:      actor,
 				ResourceID: "GLOBAL",
-				Timestamp:  time.Now(),
+				Timestamp:  time.Now().UTC(),
 			})
 		}(actor)
 	}

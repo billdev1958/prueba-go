@@ -30,7 +30,7 @@ func (r *pgxComercioRepository) Create(ctx context.Context, c *comercio.Comercio
 		INSERT INTO comercios (id, name, comission_rate, created_at)
 		VALUES ($1, $2, $3, $4)
 	`
-	c.CreatedAt = time.Now()
+	c.CreatedAt = time.Now().UTC()
 	_, err := r.Pool.Exec(ctx, query, c.ID, c.Name, c.ComissionRate.RateToString(), c.CreatedAt)
 	if err != nil {
 		return nil, err

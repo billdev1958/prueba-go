@@ -27,7 +27,7 @@ func (u *useCases) GetByID(ctx context.Context, id types.UID) (transaction.Trans
 				Action:     "TRANSACTION_GET_BY_ID",
 				Actor:      actor,
 				ResourceID: resourceID,
-				Timestamp:  time.Now(),
+				Timestamp:  time.Now().UTC(),
 			})
 		}(actor, id)
 	}

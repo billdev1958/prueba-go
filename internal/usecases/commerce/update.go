@@ -40,7 +40,7 @@ func (u *useCases) Update(ctx context.Context, c *comercio.Comercio) error {
 				Action:     "COMMERCE_UPDATE",
 				Actor:      actor,
 				ResourceID: resourceID,
-				Timestamp:  time.Now(),
+				Timestamp:  time.Now().UTC(),
 			})
 		}(actor, c.ID)
 	}

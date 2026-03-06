@@ -22,7 +22,7 @@ func (u *useCases) GetAll(ctx context.Context) ([]comercio.Comercio, error) {
 				Action:     "COMMERCE_GET_ALL",
 				Actor:      actor,
 				ResourceID: "ALL",
-				Timestamp:  time.Now(),
+				Timestamp:  time.Now().UTC(),
 			})
 		}(actor)
 	}

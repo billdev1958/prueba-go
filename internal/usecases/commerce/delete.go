@@ -35,7 +35,7 @@ func (u *useCases) Delete(ctx context.Context, id types.UID) error {
 				Action:     "COMMERCE_DELETE",
 				Actor:      actor,
 				ResourceID: resourceID,
-				Timestamp:  time.Now(),
+				Timestamp:  time.Now().UTC(),
 			})
 		}(actor, id)
 	}

@@ -38,7 +38,7 @@ func (u *useCases) Create(ctx context.Context, c *comercio.Comercio) (*comercio.
 				Action:     "COMMERCE_CREATE",
 				Actor:      actor,
 				ResourceID: resourceID,
-				Timestamp:  time.Now(),
+				Timestamp:  time.Now().UTC(),
 			})
 		}(actor, res.ID)
 	}

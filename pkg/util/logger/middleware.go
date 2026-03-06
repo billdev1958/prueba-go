@@ -10,13 +10,13 @@ import (
 // GinLogger es el middleware adaptado para Gin de uno que era originalmente para la libreria estandar
 func GinLogger(l *slog.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		start := time.Now()
+		start := time.Now().UTC()
 		path := c.Request.URL.Path
 		query := c.Request.URL.RawQuery
 
 		c.Next()
 
-		end := time.Now()
+		end := time.Now().UTC()
 		latency := end.Sub(start).Seconds()
 		status := c.Writer.Status()
 
