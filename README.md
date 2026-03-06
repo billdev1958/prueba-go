@@ -83,7 +83,7 @@ Una vez iniciada la aplicación, la documentación interactiva de Swagger está 
 `http://localhost:8080/swagger/index.html`
 
 ### Seguridad
-El sistema utiliza el encabezado `X-User-Id` para identificar al actor de las operaciones y registrarlo en los logs de auditoría.
+El sistema utiliza un **Middleware de Autenticación** global para extraer el encabezado `X-User-Id` y asegurar que la identidad del actor esté disponible de forma consistente en todas las capas del servicio.
 
 ## Sistema de Auditoría (Bitácora)
 
@@ -92,7 +92,7 @@ El proyecto incluye un robusto sistema de auditoría transversal diseñado para 
 ### Características Principales
 
 1.  **Ejecución Asíncrona**: El registro de auditoría se realiza mediante goroutines. Esto permite que la respuesta al cliente sea inmediata, delegando el guardado en base de datos a un proceso en segundo plano.
-2.  **Identificación del Actor**: La identidad del usuario (Actor) se extrae automáticamente del contexto de la petición, el cual es inyectado desde la capa de transporte (HTTP) mediante el encabezado `X-User-Id`.
+2.  **Identificación del Actor Centralizada**: Un middleware de Gin intercepta todas las peticiones, extrae el `X-User-Id` y lo inyecta en el contexto utilizando una llave tipada definida en `pkg/types`. Esto garantiza que los logs siempre tengan el actor correcto sin código repetitivo en los handlers.
 3.  **Arquitectura Desacoplada**: El sistema utiliza una interfaz `AuditRepository` permitiendo que los casos de uso dependan de una abstracción. Esto facilita el cambio del motor de auditoría (ej. de DB a una cola de mensajes o log externo) sin modificar la lógica de negocio.
 4.  **Trazabilidad Completa**: Cada registro de auditoría incluye:
     - `LogID`: Identificador único global del registro de auditoría.
@@ -102,9 +102,9 @@ El proyecto incluye un robusto sistema de auditoría transversal diseñado para 
     - `Timestamp`: Fecha y hora de la operación (formato RFC3339).
 
 ### Flujo de Trabajo
-1. El middleware/handler extrae el `X-User-Id` y lo guarda en el `context.Context`.
+1. El **Middleware de Auth** extrae el `X-User-Id` y lo guarda en el `context.Context` usando una `contextKey` privada.
 2. El UseCase recibe el contexto y ejecuta la lógica de negocio.
-3. Tras una operación exitosa, se dispara una goroutine que invoca al `AuditRepository` pasándole el contexto para recuperar al actor y persistir el log de auditoría.
+3. Tras una operación exitosa, se dispara una goroutine que invoca al `AuditRepository`, el cual usa el helper `types.GetActor(ctx)` para recuperar al actor de forma segura y persistir el log de auditoría.
 
 ## Logging Estructurado (Slog)
 
@@ -143,10 +143,12 @@ Para garantizar la precisión financiera y evitar errores de redondeo inherentes
 - **Redondeo**: Implementa el estándar IEEE 754 (Round Half Even).
 - **Tipos**: Define tipos `Amount` y `Rate` para diferenciar entre montos monetarios y tasas porcentuales, protegiendo las operaciones aritméticas mediante un contexto matemático controlado.
 
-### Estrategia de Identificadores (UID)
-Inspirado por los patrones de diseño del repositorio oficial de **Kubernetes**, el proyecto utiliza un tipo especializado `types.UID` (`pkg/types/uid.go`).
-- **Seguridad de Tipos**: En lugar de usar `string` nativos, se emplea un alias de tipo para representar identificadores únicos. Esto evita confusiones accidentales entre diferentes tipos de datos y mejora la legibilidad del código al indicar explícitamente que se espera un identificador único en las firmas de funciones.
 - **Consistencia**: Centraliza la definición de lo que constituye un identificador en el sistema, facilitando futuras migraciones o cambios en el formato de los IDs sin afectar la lógica de negocio.
+
+### Gestión de Contexto (Context Helpers)
+Para seguir las mejores prácticas de Go y evitar colisiones de llaves de contexto, el proyecto centraliza el manejo de metadatos en `pkg/types/context.go`.
+- **Llaves Privadas**: Se utilizan tipos de llave privados (`contextKey`) para que solo el paquete `types` pueda acceder directamente a los valores, protegiendo la integridad del contexto.
+- **Helper GetActor**: Proporciona un punto de acceso único y estandarizado para recuperar la identidad del usuario en cualquier parte del sistema, gestionando automáticamente valores por defecto como `system_unknown`.
 
 ## Pruebas
 
