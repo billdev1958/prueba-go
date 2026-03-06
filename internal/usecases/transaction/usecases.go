@@ -3,6 +3,7 @@ package transaction
 import (
 	"context"
 	"prueba-go/internal/domain/audit"
+	comercio "prueba-go/internal/domain/commerce"
 	"prueba-go/internal/domain/transaction"
 	"prueba-go/pkg/types"
 )
@@ -15,12 +16,18 @@ type TransactionUsecases interface {
 
 type useCases struct {
 	transactionRepo transaction.TransactionRepository
+	comercioRepo    comercio.ComercioRepository
 	auditRepo       audit.AuditRepository
 }
 
-func NewUsecases(transactionRepo transaction.TransactionRepository, auditRepo audit.AuditRepository) TransactionUsecases {
+func NewUsecases(
+	transactionRepo transaction.TransactionRepository,
+	comercioRepo comercio.ComercioRepository,
+	auditRepo audit.AuditRepository,
+) TransactionUsecases {
 	return &useCases{
 		transactionRepo: transactionRepo,
+		comercioRepo:    comercioRepo,
 		auditRepo:       auditRepo,
 	}
 }

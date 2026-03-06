@@ -123,7 +123,7 @@ func (a *App) initializeModules() error {
 	// Usecases
 	audUsecase := auditUC.NewUsecases(audRepo)
 	commUsecase := comercioUC.NewUsecases(commRepo, audRepo)
-	transUsecase := transactionUC.NewUsecases(transRepo, audRepo)
+	transUsecase := transactionUC.NewUsecases(transRepo, commRepo, audRepo)
 	repUsecase := reportUC.NewUsecases(repRepo, audRepo)
 
 	// Handlers

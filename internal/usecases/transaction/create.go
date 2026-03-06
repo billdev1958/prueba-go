@@ -16,6 +16,12 @@ func (u *useCases) Create(ctx context.Context, t *transaction.Transaction) (*tra
 		return nil, transaction.ErrInvalidTransactionAmount
 	}
 
+	comm, err := u.comercioRepo.GetByID(ctx, t.CommercioID)
+	if err != nil {
+		return nil, err
+	}
+	t.AppliedRate = comm.ComissionRate
+
 	commission, err := t.Amount.Mul(t.AppliedRate)
 	if err != nil {
 		return nil, err
