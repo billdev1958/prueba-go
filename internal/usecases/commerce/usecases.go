@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"prueba-go/internal/domain/audit"
 	comercio "prueba-go/internal/domain/commerce"
 	"prueba-go/pkg/types"
 )
@@ -16,10 +17,12 @@ type ComercioUsecase interface {
 
 type useCases struct {
 	comercioRepo comercio.ComercioRepository
+	auditRepo    audit.AuditRepository
 }
 
-func NewUsecases(comercioRepo comercio.ComercioRepository) ComercioUsecase {
+func NewUsecases(comercioRepo comercio.ComercioRepository, auditRepo audit.AuditRepository) ComercioUsecase {
 	return &useCases{
 		comercioRepo: comercioRepo,
+		auditRepo:    auditRepo,
 	}
 }

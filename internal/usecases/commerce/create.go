@@ -2,9 +2,12 @@ package usecases
 
 import (
 	"context"
+	"prueba-go/internal/domain/audit"
 	comercio "prueba-go/internal/domain/commerce"
+	"prueba-go/pkg/types"
 	"prueba-go/pkg/util/money"
 	"prueba-go/pkg/util/uuid"
+	"time"
 )
 
 func (u *useCases) Create(ctx context.Context, c *comercio.Comercio) (*comercio.Comercio, error) {
@@ -22,5 +25,22 @@ func (u *useCases) Create(ctx context.Context, c *comercio.Comercio) (*comercio.
 		return nil, comercio.ErrInvalidComercioComissionRate
 	}
 
-	return u.comercioRepo.Create(ctx, c)
+	res, err := u.comercioRepo.Create(ctx, c)
+	if err == nil {
+		actor, _ := ctx.Value("actor").(string)
+		if actor == "" {
+			actor = "system_unknown"
+		}
+
+		go func(actor string, resourceID types.UID) {
+			_ = u.auditRepo.Save(context.Background(), &audit.AuditLog{
+				LogID:      uuid.NewUUID(),
+				Action:     "COMMERCE_CREATE",
+				Actor:      actor,
+				ResourceID: resourceID,
+				Timestamp:  time.Now(),
+			})
+		}(actor, res.ID)
+	}
+	return res, err
 }

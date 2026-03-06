@@ -2,8 +2,11 @@ package transaction
 
 import (
 	"context"
+	"prueba-go/internal/domain/audit"
 	"prueba-go/internal/domain/transaction"
+	"prueba-go/pkg/types"
 	"prueba-go/pkg/util/uuid"
+	"time"
 )
 
 func (u *useCases) Create(ctx context.Context, t *transaction.Transaction) (*transaction.Transaction, error) {
@@ -27,6 +30,23 @@ func (u *useCases) Create(ctx context.Context, t *transaction.Transaction) (*tra
 
 	t.NetAmount = netAmount
 
-	return u.transactionRepo.Create(ctx, t)
+	res, err := u.transactionRepo.Create(ctx, t)
+	if err == nil {
+		actor, _ := ctx.Value("actor").(string)
+		if actor == "" {
+			actor = "system_unknown"
+		}
 
+		go func(actor string, resourceID types.UID) {
+			_ = u.auditRepo.Save(context.Background(), &audit.AuditLog{
+				LogID:      uuid.NewUUID(),
+				Action:     "TRANSACTION_CREATE",
+				Actor:      actor,
+				ResourceID: resourceID,
+				Timestamp:  time.Now(),
+			})
+		}(actor, res.ID)
+	}
+
+	return res, err
 }
