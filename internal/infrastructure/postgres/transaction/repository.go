@@ -46,44 +46,6 @@ func (r *pgxTransactionRepository) Create(ctx context.Context, t *transaction.Tr
 	return t, nil
 }
 
-func (r *pgxTransactionRepository) Update(ctx context.Context, t *transaction.Transaction) (*transaction.Transaction, error) {
-	query := `
-		UPDATE transactions
-		SET comercio_id = $1, amount = $2, applied_rate = $3, commission = $4, net_amount = $5
-		WHERE id = $6
-	`
-	res, err := r.Pool.Exec(ctx, query,
-		t.CommercioID,
-		t.Amount.AmmountToString(),
-		t.AppliedRate.RateToString(),
-		t.Commission.AmmountToString(),
-		t.NetAmount.AmmountToString(),
-		t.ID,
-	)
-	if err != nil {
-		return nil, err
-	}
-	if res.RowsAffected() == 0 {
-		return nil, transaction.ErrTransactionNotFound
-	}
-	return t, nil
-}
-
-func (r *pgxTransactionRepository) Delete(ctx context.Context, id types.UID) error {
-	query := `
-		DELETE FROM transactions
-		WHERE id = $1
-	`
-	res, err := r.Pool.Exec(ctx, query, id)
-	if err != nil {
-		return err
-	}
-	if res.RowsAffected() == 0 {
-		return transaction.ErrTransactionNotFound
-	}
-	return nil
-}
-
 func (r *pgxTransactionRepository) GetByID(ctx context.Context, id types.UID) (transaction.Transaction, error) {
 	query := `
 		SELECT id, comercio_id, amount, applied_rate, commission, net_amount, created_at
