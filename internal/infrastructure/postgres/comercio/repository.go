@@ -38,6 +38,31 @@ func (r *pgxComercioRepository) Create(ctx context.Context, c *comercio.Comercio
 	return c, nil
 }
 
+func (r *pgxComercioRepository) GetByName(ctx context.Context, name string) (*comercio.Comercio, error) {
+	query := `
+		SELECT id, name, comission_rate, created_at
+		FROM comercios
+		WHERE name = $1
+	`
+	var c comercio.Comercio
+	var comissionRateStr string
+	err := r.Pool.QueryRow(ctx, query, name).Scan(&c.ID, &c.Name, &comissionRateStr, &c.CreatedAt)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, comercio.ErrComercioNotFound
+		}
+		return nil, err
+	}
+
+	rate, err := money.NewRate(comissionRateStr)
+	if err != nil {
+		return nil, err
+	}
+	c.ComissionRate = rate
+
+	return &c, nil
+}
+
 func (r *pgxComercioRepository) Update(ctx context.Context, c *comercio.Comercio) error {
 	query := `
 		UPDATE comercios

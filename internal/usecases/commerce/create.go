@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"errors"
 	"prueba-go/internal/domain/audit"
 	comercio "prueba-go/internal/domain/commerce"
 	"prueba-go/pkg/types"
@@ -14,6 +15,14 @@ func (u *useCases) Create(ctx context.Context, c *comercio.Comercio) (*comercio.
 	c.ID = uuid.NewUUID()
 	if c.Name == "" {
 		return nil, comercio.ErrInvalidComercioName
+	}
+
+	existing, err := u.comercioRepo.GetByName(ctx, c.Name)
+	if err == nil && existing != nil {
+		return nil, comercio.ErrComercioAlreadyExists
+	}
+	if err != nil && !errors.Is(err, comercio.ErrComercioNotFound) {
+		return nil, err
 	}
 
 	maxRate, err := money.NewRate("1.00")

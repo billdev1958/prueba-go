@@ -181,4 +181,31 @@ func TestComercioRepository_CRUD(t *testing.T) {
 		err = repo.Delete(ctx, nonExistentID)
 		assert.ErrorIs(t, err, comercio.ErrComercioNotFound)
 	})
+
+	t.Run("GetByName", func(t *testing.T) {
+		cleanTable(t)
+		rate, _ := money.NewRate("0.05")
+		name := "Searchable Store"
+		_, err := repo.Create(ctx, &comercio.Comercio{ID: uuid.NewUUID(), Name: name, ComissionRate: rate})
+		assert.NoError(t, err)
+
+		found, err := repo.GetByName(ctx, name)
+		assert.NoError(t, err)
+		assert.Equal(t, name, found.Name)
+
+		_, err = repo.GetByName(ctx, "Non Existent")
+		assert.ErrorIs(t, err, comercio.ErrComercioNotFound)
+	})
+
+	t.Run("Duplicate Name Error (DB Level)", func(t *testing.T) {
+		cleanTable(t)
+		rate, _ := money.NewRate("0.05")
+		name := "Unique Store"
+
+		_, err := repo.Create(ctx, &comercio.Comercio{ID: uuid.NewUUID(), Name: name, ComissionRate: rate})
+		assert.NoError(t, err)
+
+		_, err = repo.Create(ctx, &comercio.Comercio{ID: uuid.NewUUID(), Name: name, ComissionRate: rate})
+		assert.Error(t, err)
+	})
 }

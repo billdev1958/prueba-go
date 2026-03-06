@@ -53,6 +53,10 @@ func (h *ComercioHandler) Create(c *gin.Context) {
 
 	created, err := h.usecase.Create(c.Request.Context(), commerceEntity)
 	if err != nil {
+		if err == comercio.ErrComercioAlreadyExists {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
